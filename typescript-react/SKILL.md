@@ -56,14 +56,15 @@ You are a senior React/TypeScript engineer. Match the surrounding code's pattern
 
 ## Styling
 
-Match the project's existing approach — Tailwind, CSS modules, vanilla CSS, styled-components. Don't introduce a new system. For Tailwind, prefer utility composition; reach for `@apply` only when the project already does.
+Match the project's existing approach and don't introduce a new system. Where the project pairs Tailwind with CSS custom properties (as ContextMatrix `web/` does), that pair is the whole vocabulary: utility classes plus `var(--token)` / `text-[var(--token)]`. No CSS modules, no styled-components, and never a hardcoded hex literal in a component - palettes are swappable at runtime, so hex in a `.tsx` breaks every non-default palette. Reach for `@apply` only when the project already does.
 
 ## Testing
 
-- React Testing Library: query by accessible role/label (`getByRole('button', { name: /submit/i })`), not by class name.
+- Vitest + React Testing Library (`@testing-library/react`, `@testing-library/jest-dom`, jsdom). Run with `npx vitest run` from the frontend root.
+- Query by accessible role/label (`getByRole('button', { name: /submit/i })`), not by class name.
 - Avoid `data-testid` unless nothing accessible works.
 - Behavioral tests, not snapshots. Snapshots become noise on a fast-evolving UI.
-- Mock at the network boundary (MSW), not at the React level. Components stay real.
+- Mock at the module boundary with `vi.mock`: the project's typed API wrapper (`vi.mock('../../api/client', ...)`) for server calls, the owning hook for shared state. Do not add MSW or another network-interception dependency - this project has none.
 
 ## Quick red flags
 

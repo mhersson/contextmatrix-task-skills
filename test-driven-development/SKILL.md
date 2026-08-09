@@ -28,8 +28,12 @@ Write the test first. Watch it fail. Write minimal code to pass.
 - Documentation-only changes
 - Dependency bumps with no behavior change
 
-If you skip TDD on a card, note the reason via `add_log` (e.g.,
-"TDD skipped: doc-only change") so the reviewer can verify.
+If you skip TDD, state the reason in your work summary and in the card body's
+`## Notes` (e.g. "TDD skipped: doc-only change") so the reviewer can verify.
+If - and only if - `add_log` is in your tool list, also log it:
+`add_log(card_id=<card id>, agent_id=<your agent id>, action="note",
+message="TDD skipped: doc-only change")`. Do not call `add_log` when it is not
+in your tool list; the worker harness has no board tools.
 
 Thinking "skip TDD just this once"? Stop. That's rationalization.
 
@@ -54,6 +58,15 @@ Implement fresh from tests. Period.
 ```
 RED → Verify fails correctly → GREEN → Verify passes → REFACTOR → (next test)
 ```
+
+### Find the Test Command First
+
+Before the first RED, discover how this repo runs tests: check the `Makefile`,
+then `package.json` scripts / `go.mod` / `pyproject.toml`, then the CI workflow.
+Note both the focused command (one file or one test) and the full-suite command.
+Use the focused one for the RED/GREEN loop and the full one before you claim
+done. Do not copy the commands from this skill's examples - they are TypeScript
+illustrations, not this project's toolchain.
 
 ### RED — Write Failing Test
 
@@ -249,8 +262,9 @@ Never fix bugs without a test.
 
 ## Testing Anti-Patterns
 
-When adding mocks or test utilities, read `testing-anti-patterns.md` in this
-directory to avoid common pitfalls:
+When adding mocks or test utilities, load this skill's `testing-anti-patterns.md`
+with the skill tool - `skill(skill="test-driven-development", file="testing-anti-patterns.md")` -
+to avoid common pitfalls:
 - Testing mock behavior instead of real behavior
 - Adding test-only methods to production classes
 - Mocking without understanding dependencies

@@ -11,6 +11,7 @@ You are a senior engineer playing devil's advocate. Your goal is to catch real p
 
 ### 1. Correctness
 
+- Read the repo's instruction file first - `CLAUDE.md` at the repo root (plus any nested one, e.g. `web/CLAUDE.md`) or `AGENTS.md` at the module root. It is the authority on the project's trust model, verify/lint commands, error and logging conventions, and documentation rules. A finding that contradicts it is a false positive; a change that breaks it is a real one.
 - Does the code do what the task description says? Read both before opening the diff.
 - Edge cases: empty input, single item, max size, concurrent access. Handled or explicitly out-of-scope?
 - Error paths: every error has a return path or is propagated correctly. No silent swallowing.
@@ -19,7 +20,7 @@ You are a senior engineer playing devil's advocate. Your goal is to catch real p
 ### 2. Security
 
 - Untrusted input crossing into trusted territory: SQL queries, shell commands, file paths, deserialization, template rendering, regex.
-- Authn/authz on new endpoints. Default-deny posture preserved.
+- Authn/authz on new endpoints, judged against the trust model the project documents (`CLAUDE.md` / `AGENTS.md` / `docs/architecture.md`). Do not flag the absence of auth when the project states it has none, and do not re-flag anything the project lists as an accepted non-vulnerability.
 - Secrets: not logged, not committed, not in error messages.
 - Dependencies: any new package added? Well-maintained? Transitive surprises?
 
@@ -44,7 +45,9 @@ You are a senior engineer playing devil's advocate. Your goal is to catch real p
 
 ## What to skip
 
-**Iron law:** stay scoped. If it's not in the diff, don't review it.
+**Iron law:** stay scoped. Review the change set - the diff *plus* uncommitted and untracked working-tree files. Don't wander outside it.
+
+Two carve-outs. When you claim a specific statement (comment, doc line, error message) is incorrect, grep the whole repo for other copies or close paraphrases and list every hit - duplicates outside the change set count. When the change breaks a rule stated in the repo's instruction file, cite the rule even though that file is not in the diff.
 
 - Subjective style debates (naming, formatting). The linter and existing style settle these.
 - Hypothetical future requirements ("what if we want to support X?"). Out of scope.
@@ -62,16 +65,17 @@ Use four tiers. Classify honestly — not everything is Critical, not everything
 
 ## How to report
 
+- **The invoking prompt's output format always wins.** If the prompt that engaged this skill specifies a report block (headings, tiers, field names, separators), emit exactly that block and ignore the shape below. Use the shape below only when the prompt gave no format.
 - Lead with the highest-severity findings.
-- Each finding uses this format: `**Where:** file:line — **What:** ... — **Why:** ... — **Fix:** ...`
+- Default finding shape: `- **Where:** `file:line` - **What:** ... - **Why:** ... - **Fix:** ...`
 - If the change is solid, say so. False neutrality wastes everyone's time.
 
 Sample finding:
 
 ```
-**Where:** `service/cards.go:142` — **What:** AssignedAgent set after the early
-return on line 136 — **Why:** claims initiated mid-validation leak —
-**Fix:** move the assignment above the validation block, or guard with a defer.
+- **Where:** `service/cards.go:142` - **What:** AssignedAgent set after the early
+  return on line 136 - **Why:** claims initiated mid-validation leak -
+  **Fix:** move the assignment above the validation block, or guard with a defer.
 ```
 
 ## Scope discipline
@@ -81,12 +85,21 @@ return on line 136 — **Why:** claims initiated mid-validation leak —
 - Don't propose alternate designs unless the current one is broken or unsafe.
 - "How would I have written this?" is not a review question. "Does this work, and is it safe?" is.
 
+## Before you submit
+
+Re-read every finding and delete the ones that do not survive:
+
+- No evidence, no finding. Each one cites a file and line you actually read.
+- By-design is not a bug. If the repo's instruction file or a nearby comment explains the behavior, you are reading intent as a defect.
+- Confirm the blame. A pre-existing problem the diff merely moved is not this change's finding.
+- Severity honestly. When torn between Minor and Nit, choose Minor; when torn between Important and Minor, say which way you leaned and why.
+
 ## Quick red flags
 
 | Red flag                                                          | Severity             |
 | ----------------------------------------------------------------- | -------------------- |
 | String concat building a SQL/shell/path                           | Critical             |
-| New endpoint with no auth check                                   | Critical             |
+| New endpoint with no auth check, where the trust model requires one | Critical           |
 | Secret in a log line, error message, or config                    | Critical             |
 | Goroutine/task with no shutdown path                              | Important            |
 | Caught exception silently passed                                  | Important            |

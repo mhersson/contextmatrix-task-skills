@@ -14,8 +14,8 @@ Code review requires technical evaluation, not emotional performance.
 ## The Response Pattern
 
 ```
-WHEN receiving code review feedback (from a reviewer subagent
-or from a human reviewer's notes in the card activity log):
+WHEN receiving code review feedback (from the `## Review Findings (Round <N>)`
+section of the parent card body, or from a human reviewer's notes):
 
 1. READ: Complete feedback without reacting
 2. UNDERSTAND: Restate requirement in own words (or ask)
@@ -25,9 +25,14 @@ or from a human reviewer's notes in the card activity log):
 6. IMPLEMENT: One item at a time, test each
 ```
 
-In CM, reviewer feedback lives in the card's activity log
-(`get_card` → look at the most recent review entries) and may also
-appear as updates to the card body. Read all of it before acting.
+In CM, reviewer feedback lives in the **parent card body** under the heading
+`## Review Findings (Round <N>)` - one section per review round. Call
+`get_card(card_id=<parent_id>)` and read the highest-numbered round; earlier
+rounds show what was already raised. The card's activity log carries only the
+reviewer's `review_completed` entry
+(`head=<sha> recommendation=<approve|revise>`), not the findings text. If your
+own card body has a `## Source` section, also `get_card` that source ID - it
+holds the original change context the findings reference.
 
 ## Forbidden Responses
 
@@ -46,8 +51,12 @@ appear as updates to the card body. Read all of it before acting.
 
 ```
 IF any item is unclear:
-  STOP - do not implement anything yet
-  ASK for clarification on unclear items via add_log
+  DO NOT guess and DO NOT implement the clear items in isolation
+  HITL (a human is in the loop): ask in chat and wait
+  Autonomous (you are a sub-agent): record the ambiguity with `add_log`,
+    then follow execute-task Step 8 - `transition_card` to `blocked`
+    and print TASK_BLOCKED with `needs_human: true`. Never stop silently:
+    nothing reads add_log for answers during an autonomous run.
 
 WHY: Items may be related. Partial understanding = wrong implementation.
 ```
@@ -59,7 +68,8 @@ You understand 1,2,3,6. Unclear on 4,5.
 
 ❌ WRONG: Implement 1,2,3,6 now, ask about 4,5 later
 ✅ RIGHT: "I understand items 1,2,3,6. Need clarification on 4 and 5
-          before proceeding." (recorded via add_log; in HITL, asked in chat)
+          before proceeding." (in HITL, asked in chat; autonomous, recorded via
+          add_log then reported as TASK_BLOCKED with needs_human: true)
 ```
 
 ## Source-Specific Handling
@@ -71,8 +81,12 @@ You understand 1,2,3,6. Unclear on 4,5.
 - **Skip to action** or technical acknowledgment.
 
 ### From a reviewer subagent (autonomous)
-The CM `review-task` phase produces feedback as activity-log entries on
-the card. Treat these the same way you'd treat any technical critique:
+In an autonomous run you normally receive findings twice over: the orchestrator
+copies each Critical/Important finding verbatim into your fix subtask's body
+(with its acceptance criterion), and the full synthesized set - including Minor
+and Nit tiers - sits in the parent card body under
+`## Review Findings (Round <N>)`. Read both before acting. Treat them the same
+way you'd treat any technical critique:
 
 ```
 BEFORE implementing:
@@ -117,10 +131,16 @@ validation, accessibility spec, etc.) that govern the file?
 - `fix` — Critical and Important findings, regardless of confidence. Low
   confidence is a signal to read more before fixing, not to defer.
 - `fix` — Minor findings at high confidence.
-- `defer` — Minor findings at low or medium confidence. Spawn a follow-up
-  via `create_card` (sibling of this card's parent) instead of attempting
-  the fix in this card. A speculative fix that introduces a new defect is
-  worse than a tracked follow-up.
+- `defer` — Minor findings at low or medium confidence. Spawn a follow-up with
+  `create_card(project=<this card's project>, title='Follow-up: <one-line
+  finding summary>', body=<the finding's full Where/What/Why/Fix block>,
+  type=<same type as the card under review>, priority='low',
+  parent=<the parent of the card under review, or omit if it has none>)`.
+  Do **not** parent the follow-up to the card under review - `create_card`
+  overrides `type` to `subtask` when `parent` is set, and the orchestrator's
+  next `get_ready_tasks` sweep would spawn it immediately instead of deferring
+  it. A speculative fix that introduces a new defect is worse than a tracked
+  follow-up.
 - `reject` — verification shows the finding is wrong. Record reasoning via
   `add_log` (same pattern as the existing pushback section).
 
@@ -129,15 +149,23 @@ from scratch knowing what I know now, would I write it this way?
 - If **no** → `fix`.
 - If **yes** → likely `defer` (style preference) or `reject` (wrong critique).
 
-Write the triage decisions to the card body **before** any code change as
-a `## Revision Plan` section. One bullet per finding:
+Write the triage decisions **before** any code change with
+`update_card(card_id=<your card_id>, agent_id=<your agent_id>,
+upsert_section_heading='Revision Plan', upsert_section_content=<bullets>)`.
+Never re-emit the whole body - the upsert leaves every other section,
+including `## Review Findings`, untouched. One bullet per finding:
 
 ```
 - <Severity> | <file:line> — <one-line summary> → **<decision>** (<confidence>; <optional note>).
 ```
 
-This lets the next review pass — and any human reading the card — see what
-was deliberately deferred and why.
+This is the durable audit trail for a human reading the card. It is **not**
+automatically visible to the next review pass - review-task receives subtask
+summaries without bodies, and its injected parent body is filtered to the intro,
+`## Plan`, `## Review Findings`, and `## Decisions`. So also record each
+deferral in the activity log, which the next reviewer does read:
+`add_log(card_id=<parent_id>, agent_id=<your agent_id>, action='finding_deferred',
+message='<severity> <file:line> deferred: <reason> (follow-up <card-id>)')`.
 
 ## Implementation Order
 

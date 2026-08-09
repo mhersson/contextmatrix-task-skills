@@ -126,14 +126,39 @@ Skip any step = lying, not verifying
 ## Common verification commands
 
 If the project has a `Makefile`, prefer `make test` / `make lint` / `make build`.
-Otherwise, fall back to language-native commands:
+
+**In ContextMatrix those three are Go-only.** `make test` is
+`go test ./cmd/... ./internal/...`, `make lint` is `golangci-lint run`, and
+`make build` runs `tsc -b && vite build` - no ESLint, no vitest. If you touched
+anything under `web/`, `make test-frontend` (vitest) and `make lint-frontend`
+(eslint) are **also required** before any completion claim; CI blocks the PR on
+both.
+
+`make test` / `make lint` / `make build` are the minimum, not the whole gate.
+Read the repo's `AGENTS.md` / `CLAUDE.md` verification section and its
+`Makefile` targets before claiming completion. In this ecosystem:
+`contextmatrix-agent`, `contextmatrix-chat`, `contextmatrix-harness` and
+`contextmatrix-backendkit` also require `make test-race` clean and
+`gofumpt -l .` empty (`make fmt`, never `gofmt` - `make lint` does not catch the
+difference); `contextmatrix-harness` and `contextmatrix-backendkit` additionally
+require `make deps-gate` to pass - it is a separate CI job.
+
+Where no Makefile answers the question, discover the command rather than
+guessing a language default: check the CI workflow, then `AGENTS.md` /
+`CLAUDE.md`, then any checked-in wrapper script. The table below is the last
+resort, not the first move:
 
 | Language | Test | Lint | Build |
 |----------|------|------|-------|
 | Go       | `go test ./...` | `golangci-lint run` | `go build ./...` |
 | Node/TS  | `npm test` | `npm run lint` | `npm run build` |
-| Python   | `pytest` | `ruff check` | (n/a or `mypy`) |
+| Python   | `pytest` | `ruff check` | `ty check` |
 | Rust     | `cargo test` | `cargo clippy` | `cargo build` |
+
+**Compiling is not working.** A clean build and a clean typecheck prove the code
+is well-formed, not that the change does what the card asked. When the card
+describes runtime behavior, the changed path has to actually execute - a test
+that covers it, or the real command run once - before you claim it works.
 
 ## The Bottom Line
 

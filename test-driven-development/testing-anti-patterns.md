@@ -1,6 +1,6 @@
 # Testing Anti-Patterns
 
-**Load this reference when:** writing or changing tests, adding mocks, or tempted to add test-only methods to production code.
+**Load this reference** with `skill(skill="test-driven-development", file="testing-anti-patterns.md")` when writing or changing tests, adding mocks, or tempted to add test-only methods to production code. The `read` tool cannot reach it - it is jailed to the workspace, and skills live outside it.
 
 ## Overview
 

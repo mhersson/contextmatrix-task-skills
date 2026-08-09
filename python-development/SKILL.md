@@ -5,13 +5,23 @@ description: Use when writing or modifying Python source files. Patterns for err
 
 You are a senior Python engineer. Match the surrounding code's style first; introduce new patterns only when the existing one is clearly worse for the task.
 
+## Toolchain
+
+The ContextMatrix Python worker image ships `uv`, `ruff` and `ty` (CPython 3.14,
+no mypy, no preinstalled project dependencies). Use them unless the project pins
+something else:
+
+- `uv run <cmd>` / `uv add --dev <pkg>` for anything needing dependencies. Do not install into the managed interpreter under `/opt/python` - it is root-owned and the container runs as UID 1000.
+- `ruff check` and `ruff format` for lint and formatting. Honour the project's `pyproject.toml` config; never add your own rule set.
+- `ty check` after any signature change - `ty` is the installed type checker, not mypy.
+
 ## Errors
 
 **Iron law:** raise specific exception types, catch the narrowest you can handle.
 
 - Define custom exception classes when no stdlib type fits: `class CardNotFoundError(LookupError): ...`. Inherit from the closest stdlib base.
 - Catch narrowly: `except json.JSONDecodeError:`, not `except Exception:`. Bare `except:` is almost always wrong.
-- `from e` to chain context: `raise ConfigError("could not parse") from e`. Preserves the original traceback.
+- `from e` to chain context: `raise ConfigError("could not parse") from e`. Marks the original as the direct cause (`__cause__`) instead of leaving it as incidental `__context__`.
 - Never `pass` an exception silently. If you genuinely don't care, log and explain in a comment.
 
 ## Type hints
@@ -21,7 +31,7 @@ You are a senior Python engineer. Match the surrounding code's style first; intr
 - `def parse(path: Path) -> Config:` — args and return type, always.
 - `from __future__ import annotations` at the top of files with forward references.
 - `X | None` (Py 3.10+) over `Optional[X]`. `Optional[X]` only when the project's already on it.
-- `Sequence[X]` / `Mapping[K, V]` for parameters; `list[X]` / `dict[K, V]` for return types — accept narrow, return broad.
+- `Sequence[X]` / `Mapping[K, V]` for parameters; `list[X]` / `dict[K, V]` for return types - accept broad, return specific (same idea as Go's accept interfaces, return concrete types).
 - Don't use `Any` to silence the checker. Narrow with `cast` (sparingly), or fix the type.
 
 ## Idioms
@@ -71,8 +81,9 @@ You are a senior Python engineer. Match the surrounding code's style first; intr
 
 | Red flag                                  | Why it's wrong                                              |
 | ----------------------------------------- | ----------------------------------------------------------- |
-| Bare `except:` or `except Exception:`     | Catches `KeyboardInterrupt`/`SystemExit`, hides bugs        |
-| `raise SomeError` without `from e`        | Loses the original traceback                                |
+| Bare `except:`                            | Also catches `KeyboardInterrupt`/`SystemExit`; use `except Exception:` if you must catch broadly |
+| `except Exception:` around a whole block  | Hides bugs; catch the specific type you can handle          |
+| `raise SomeError` without `from e`        | Reads as incidental "During handling..." context instead of the declared cause; use `from None` only to suppress it deliberately |
 | Function with no return annotation        | Public API must be typed                                    |
 | `Any` in a signature                      | Use a precise type or `cast` at the boundary                |
 | Mutable default arg: `def f(x=[]):`       | Shared across calls; use `None` and assign inside           |
