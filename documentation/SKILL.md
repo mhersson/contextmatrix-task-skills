@@ -18,11 +18,11 @@ You are a senior technical writer. Your goal is documentation a busy engineer ca
 
 **Iron law:** active, present, concrete.
 
-- Active voice: *"The agent backend clones the task-skills repo"* - not *"the task-skills repo will be cloned."*
+- Active voice: *"The scheduler retries the job"* - not *"the job will be retried."*
 - Present tense: *"The cache evicts at 1 GB"* - not *"the cache will evict."*
 - Concrete: *"Docker bind-mounts the host path"* - not *"the system mounts the path."*
 - One idea per paragraph. If you can't summarize the paragraph in eight words, split it.
-- No em-dashes. Use a hyphen (-) for the same break. Every ContextMatrix repo states this rule and every tracked doc obeys it.
+- No em-dashes. Use a hyphen (-) for the same break. Where the project's existing docs use em-dashes throughout, match the project - consistency across a doc set beats this preference.
 
 ### Avoid weasel words
 
@@ -79,7 +79,7 @@ Skip the badge wall unless the project genuinely needs it. Skip table-of-content
 | ------------------------------------------------- | -------------------------------------------- |
 | "We" as the subject                               | Name the actor: *the agent backend*, *the user* |
 | "Will be" / "should be" / "may be"                | Use indicative: *is*, *isn't*               |
-| An em-dash anywhere in the file                   | Replace with a hyphen (-)                   |
+| An em-dash in a doc set that uses none             | Replace with a hyphen (-)                   |
 | Pseudocode without a label                        | Mark it explicitly                          |
 | Examples with `foo`/`bar`/`baz`                   | Use realistic names                         |
 | Section labeled "TODO" / "TBD" in shipped doc     | Either fill in or remove the section        |

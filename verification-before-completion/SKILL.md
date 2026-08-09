@@ -127,21 +127,23 @@ Skip any step = lying, not verifying
 
 If the project has a `Makefile`, prefer `make test` / `make lint` / `make build`.
 
-**In ContextMatrix those three are Go-only.** `make test` is
-`go test ./cmd/... ./internal/...`, `make lint` is `golangci-lint run`, and
-`make build` runs `tsc -b && vite build` - no ESLint, no vitest. If you touched
-anything under `web/`, `make test-frontend` (vitest) and `make lint-frontend`
-(eslint) are **also required** before any completion claim; CI blocks the PR on
-both.
+**Those three are the minimum, not the whole gate.** Read every target in the
+`Makefile` and every job in the CI workflow before claiming completion, and read
+the verification section of the repo's `AGENTS.md` / `CLAUDE.md`. A repo's
+`make test` is frequently scoped to one language or one directory: in a polyglot
+repo the second suite usually sits behind its own target that `make test` never
+invokes and CI still blocks the PR on. Gates a green `make test` will not catch:
 
-`make test` / `make lint` / `make build` are the minimum, not the whole gate.
-Read the repo's `AGENTS.md` / `CLAUDE.md` verification section and its
-`Makefile` targets before claiming completion. In this ecosystem:
-`contextmatrix-agent`, `contextmatrix-chat`, `contextmatrix-harness` and
-`contextmatrix-backendkit` also require `make test-race` clean and
-`gofumpt -l .` empty (`make fmt`, never `gofmt` - `make lint` does not catch the
-difference); `contextmatrix-harness` and `contextmatrix-backendkit` additionally
-require `make deps-gate` to pass - it is a separate CI job.
+- a per-language suite (`make test-frontend`, `make test-e2e`) covering code
+  outside the repo's primary language;
+- a race or sanitizer run as a separate job (`make test-race`, `-race`,
+  `-fsanitize`);
+- a formatter check the linter does not report on;
+- a dependency, license, or module-boundary gate (`make deps-gate`,
+  `go mod tidy -diff`, `npm audit`).
+
+Enumerate this repo's own list once, at the start of the card, and verify against
+that list - not against these examples.
 
 Where no Makefile answers the question, discover the command rather than
 guessing a language default: check the CI workflow, then `AGENTS.md` /

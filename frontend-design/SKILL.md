@@ -15,8 +15,8 @@ technical constraints.
 
 Check before designing anything. If the surface already has a design system - a
 token file of CSS custom properties, a palette or theme provider, declared font
-tokens, or an instruction file in the frontend directory (`web/CLAUDE.md`,
-`AGENTS.md`) - this skill does not apply. Stop, read that instruction file,
+tokens, or an instruction file in the frontend directory (a nested `CLAUDE.md`
+or `AGENTS.md`) - this skill does not apply. Stop, read that instruction file,
 follow the system it describes, and use `typescript-react` for the
 implementation. Inside an existing system never add a font, a hex literal, a
 palette, a theme mechanism, or a styling approach the project does not already

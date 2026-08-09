@@ -9,6 +9,39 @@ checkpoint-revise and review-specialist prompts; the model loads a skill by
 calling the `skill` tool with that name. Only the menu line costs context until
 a skill is actually called.
 
+## Scope: generic across every project
+
+These skills are mounted for **every project a ContextMatrix board can ever
+carry**, not only for work on ContextMatrix itself. A skill states what is true
+of the craft or of the worker container. It never states what is true of one
+codebase.
+
+Three kinds of statement, only one of which is a bug:
+
+| Kind                | Example                                                           | Allowed |
+| ------------------- | ----------------------------------------------------------------- | ------- |
+| Craft               | "Wrap errors with `fmt.Errorf` and `%w`."                         | yes     |
+| Harness / container | "`add_log` records the deferral"; "the worker image ships `ruff`." | yes     |
+| One codebase        | "`make test` is Go-only"; "there are no typed slog attrs here."   | **no**  |
+
+The board tools (`get_card`, `add_log`, `create_card`), the card body sections,
+`TASK_BLOCKED`, and the worker's preinstalled toolchain are properties of the
+runtime, which is identical whatever repo the agent is editing. Say those
+freely. Do not name ContextMatrix repos, their `Makefile` targets, their CI
+jobs, their file paths, or their local conventions - an agent reading the skill
+is usually working in someone else's code, where every one of those is false and
+following it produces a wrong change.
+
+Two rules that follow:
+
+- **State a preference as a preference, and let the project win.** "Prefer
+  `gofumpt` where the repo declares no formatter" survives contact with a repo
+  that pins `gofmt`. "Use `gofumpt` even when `make fmt` runs `go fmt`" does
+  not.
+- **Teach the discovery, not the answer.** A list of gates a repo *might* have
+  (race job, frontend suite, dependency gate) transfers everywhere. A list of
+  the gates *your* repos have transfers nowhere.
+
 ## Layout
 
 One directory per skill at the repo root. Directory name = skill name

@@ -37,9 +37,10 @@ Do not modernize code the card did not ask you to touch. Fix the idiom on lines 
 
 ## Formatting
 
-- Format with `gofumpt -w .`, not `gofmt`. `gofumpt -l .` must come back empty before you call the work done - this holds even in a repo whose `make fmt` target still runs `go fmt`.
+- Use the formatter the project declares. Where its `Makefile`, CI job, or instruction file names one, match it - reformatting with a stricter tool than the project runs produces diff noise and a red format check.
+- Where the repo declares none, prefer `gofumpt -w .` over `gofmt`, and leave `gofumpt -l .` empty before you call the work done.
 - Run `go fix ./...` before committing; it rewrites legacy stdlib forms into the current idiom.
-- `golangci-lint` runs with `fix: false` and never rewrites the tree. Fix findings by hand.
+- Run `golangci-lint` read-only - that is its default, `--fix` is opt-in - and fix findings by hand unless the repo's own config or CI job turns the rewrite on.
 
 ## Errors
 
@@ -154,7 +155,9 @@ On Go before 1.25, call `wg.Add` before `go`, never inside the goroutine - `Wait
 
 ## Logging
 
-- `log/slog` with structured fields as bare key-value pairs: `slog.Info("git sync: periodic pull started", "interval", s.interval)`. Never typed attributes (`slog.String`, `slog.Int`, `slog.Any`) - there are none in this codebase. No `fmt.Println` in production code.
+- `log/slog` with structured fields, never an interpolated message: `slog.Info("periodic pull started", "interval", s.interval)`, not `slog.Info(fmt.Sprintf("periodic pull started every %s", s.interval))`. A value baked into the message string cannot be filtered or aggregated.
+- Match the file's existing attribute style and do not mix the two in one package. Bare key-value pairs (`"interval", d`) and typed attributes (`slog.Duration("interval", d)`) are both idiomatic; typed attrs cost keystrokes and buy compile-time protection against the odd-argument-count bug.
+- No `fmt.Println` in production code.
 
 ## Quick red flags
 

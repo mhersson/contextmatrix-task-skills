@@ -115,7 +115,7 @@ return <CardList cards={cards} />;
 
 ## Styling
 
-Match the project's existing approach and don't introduce a new system. Where the project pairs Tailwind with CSS custom properties (as ContextMatrix `web/` does), that pair is the whole vocabulary: utility classes plus `var(--token)` / `text-[var(--token)]`. No CSS modules, no styled-components. Reach for `@apply` only when the project already does.
+Match the project's existing approach and don't introduce a new system. Identify what it already uses - Tailwind, CSS modules, styled-components, vanilla-extract, plain CSS - before writing a single class, and stay inside it. A second styling system in one codebase is a defect, not a preference. Where the project pairs Tailwind with CSS custom properties, that pair is the whole vocabulary: utility classes plus `var(--token)` / `text-[var(--token)]`. Reach for `@apply`, or for any other escape hatch, only when the project already does.
 
 **Iron law:** components reference tokens, never literal values.
 
@@ -128,11 +128,11 @@ Match the project's existing approach and don't introduce a new system. Where th
 
 ## Testing
 
-- Vitest + React Testing Library (`@testing-library/react`, `@testing-library/jest-dom`, jsdom). Run with `npx vitest run` from the frontend root.
+- Use the project's runner - Vitest or Jest - with React Testing Library (`@testing-library/react`, `@testing-library/jest-dom`) on jsdom. Read the invocation out of `package.json` scripts rather than guessing it, and run it from the frontend root, which is not always the repo root.
 - Query by accessible role/label (`getByRole('button', { name: /submit/i })`), not by class name.
 - Avoid `data-testid` unless nothing accessible works.
 - Behavioral tests, not snapshots. Snapshots become noise on a fast-evolving UI.
-- Mock at the module boundary with `vi.mock`: the project's typed API wrapper (`vi.mock('../../api/client', ...)`) for server calls, the owning hook for shared state. Do not add MSW or another network-interception dependency - this project has none.
+- Mock at the module boundary (`vi.mock` / `jest.mock`): the project's own API-wrapper module for server calls, the owning hook for shared state. If the project already has a network-interception layer (MSW or similar), use it. If it does not, mock the module - adding a new test dependency is a change the card has to authorize.
 
 ## Quick red flags
 
