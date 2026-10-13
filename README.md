@@ -18,19 +18,29 @@ codebase.
 
 Three kinds of statement, only one of which is a bug:
 
-| Kind                | Example                                                           | Allowed |
-| ------------------- | ----------------------------------------------------------------- | ------- |
-| Craft               | "Wrap errors with `fmt.Errorf` and `%w`."                         | yes     |
-| Harness / container | "`add_log` records the deferral"; "the worker image ships `ruff`." | yes     |
-| One codebase        | "`make test` is Go-only"; "there are no typed slog attrs here."   | **no**  |
+| Kind                | Example                                                                                                 | Allowed |
+| ------------------- | ------------------------------------------------------------------------------------------------------- | ------- |
+| Craft               | "Wrap errors with `fmt.Errorf` and `%w`."                                                               | yes     |
+| Harness / container | "If - and only if - `add_log` is in your tool list, log the deferral"; "the worker image ships `ruff`." | yes     |
+| One codebase        | "`make test` is Go-only"; "there are no typed slog attrs here."                                         | **no**  |
 
-The board tools (`get_card`, `add_log`, `create_card`), the card body sections,
-`TASK_BLOCKED`, and the worker's preinstalled toolchain are properties of the
-runtime, which is identical whatever repo the agent is editing. Say those
-freely. Do not name ContextMatrix repos, their `Makefile` targets, their CI
-jobs, their file paths, or their local conventions - an agent reading the skill
-is usually working in someone else's code, where every one of those is false and
-following it produces a wrong change.
+The card body sections and the worker's preinstalled toolchain are properties
+of the runtime, identical whatever repo the agent is editing. Say those freely.
+The worker's own tools (`finish`, `verify`, `skill`) are not offered in every
+runtime or phase, so name one only on the condition that it is offered ("When a
+`verify` tool is offered, ..."). The board tools (`get_card`,
+`add_log`, `create_card`, `update_card`, `transition_card`, `complete_task`)
+are runtime properties too, but only of board-driven sessions: Claude Code
+running ContextMatrix's workflow skills, and chat. `TASK_BLOCKED` belongs to
+those workflow skills (`execute-task` Step 8). The agent worker offers no board
+tools and reads no `TASK_BLOCKED`. So a skill line that calls a board tool or
+prints `TASK_BLOCKED` must be gated with "If - and only if - `add_log` is in
+your tool list", and must say what to do when it is not.
+
+Do not name ContextMatrix repos, their `Makefile` targets, their CI jobs, their
+file paths, or their local conventions - an agent reading the skill is usually
+working in someone else's code, where every one of those is false and following
+it produces a wrong change.
 
 Two rules that follow:
 
@@ -102,13 +112,17 @@ Only `description` is read from the frontmatter - by CM's lister
 (`internal/api/task_skills.go`) and by the harness `skill` tool
 (`contextmatrix-harness/tools/skill.go`). Every other key is ignored, and the
 file is handed to the model with its frontmatter intact, so extra keys are
-wasted tokens. There is no per-skill tool gate: `allowed-tools` is not honored
-anywhere.
+wasted tokens there. The agent worker and chat have no per-skill tool gate and
+ignore `allowed-tools`; Claude Code, which loads these skills in local
+sessions, does honor it.
 
 Two hard constraints, both silent when broken:
 
-- `description` must be a **single line**. A folded (`>`) or multi-line value
-  parses as empty and the skill is dropped from the menu with no error.
+- `description` must be a **single line**. The harness `skill` tool reads only
+  the text after `description:` on that line, so a folded or literal block
+  (`>`, `|`) reaches the menu as that bare indicator, and a value wrapped onto
+  a second line as its first line only. CM's lister parses the full YAML value,
+  so `GET /api/task-skills` still looks right while the menu is wrong.
 - The directory name must match `^[a-z0-9][a-z0-9._-]*$`. It is the callable
   name; the frontmatter `name` is not used for lookup.
 
@@ -152,10 +166,17 @@ worker's skill menu.
 Two other skill systems exist; don't confuse them with this repo.
 
 - **Workflow skills** live in the contextmatrix repo under `workflow-skills/`
-  and drive _what_ the agent does. Adding one needs both the markdown file and a
-  `skillBuilders` entry in `internal/mcp/prompts.go` - `get_skill` returns
-  `unknown skill` for any name absent from that map.
+  and drive _what_ the agent does. Adding one needs the markdown file, a
+  `skillBuilders` entry in `internal/mcp/prompts.go` (`get_skill` returns
+  `unknown skill` for any name absent from that map), and the name in the
+  `get_skill` input's `jsonschema` tag in `internal/mcp/tools.go`, which an
+  init-time check compares against that map and panics on drift.
 - **Interactive-session skills** (skill authoring, brainstorming, planning) run
-  in Claude Code, where subagents exist. They do not belong here: a worker's
-  model-callable tools are `read`, `edit`, `write`, `grep`, `glob`, `git`,
-  `bash`, `finish` and `skill`, and nothing else.
+  in Claude Code, where subagents exist. They do not belong here: no worker
+  phase offers a subagent tool or a board tool. The worker's write phases
+  (coder, checkpoint-revise, fix, document) get `read`, `edit`, `write`,
+  `grep`, `glob`, `git`, `bash` and `finish`, plus `skill` when skills are
+  mounted; the coder and checkpoint-revise phases also get `verify` when a
+  verify command resolved. Its read-only phases get fewer: at most `read`,
+  `grep`, `glob` and `git`, with `skill` added for the review specialists and
+  `record_finding` for the planner.
