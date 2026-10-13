@@ -125,6 +125,9 @@ Skip any step = lying, not verifying
 
 ## Common verification commands
 
+When a `verify` tool is offered, run it first; it is the check that counts.
+Run only the gates it does not cover yourself.
+
 If the project has a `Makefile`, prefer `make test` / `make lint` / `make build`.
 
 **Those three are the minimum, not the whole gate.** Read every target in the
