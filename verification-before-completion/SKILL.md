@@ -34,7 +34,7 @@ when you have board tools):
 4. VERIFY: Does output confirm the claim?
    - If NO: State actual status with evidence
    - If YES: State claim WITH evidence
-5. ONLY THEN: Make the claim or transition the card
+5. ONLY THEN: Make the claim or finish
 
 Skip any step = lying, not verifying
 ```

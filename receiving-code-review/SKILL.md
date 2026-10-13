@@ -140,7 +140,8 @@ IF conflicts with prior architectural decisions:
 IF reviewer suggests "implementing properly":
   grep codebase for actual usage
 
-  IF unused: log "Endpoint isn't called. Removing (YAGNI)?"
+  IF unused: remove it and record "Endpoint isn't called. Removed (YAGNI)." -
+    via add_log if it is in your tool list, else in the summary you finish with
   IF used: implement properly
 ```
 

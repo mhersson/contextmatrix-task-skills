@@ -24,9 +24,11 @@ Three kinds of statement, only one of which is a bug:
 | Harness / container | "If - and only if - `add_log` is in your tool list, log the deferral"; "the worker image ships `ruff`." | yes     |
 | One codebase        | "`make test` is Go-only"; "there are no typed slog attrs here."                                         | **no**  |
 
-The card body sections, the worker's own tools (`finish`, `verify`, `skill`)
-and its preinstalled toolchain are properties of the runtime, identical whatever
-repo the agent is editing. Say those freely. The board tools (`get_card`,
+The card body sections and the worker's preinstalled toolchain are properties
+of the runtime, identical whatever repo the agent is editing. Say those freely.
+The worker's own tools (`finish`, `verify`, `skill`) are not offered in every
+runtime or phase, so name one only on the condition that it is offered ("When a
+`verify` tool is offered, ..."). The board tools (`get_card`,
 `add_log`, `create_card`, `update_card`, `transition_card`, `complete_task`)
 are runtime properties too, but only of board-driven sessions: Claude Code
 running ContextMatrix's workflow skills, and chat. `TASK_BLOCKED` belongs to
