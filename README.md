@@ -112,13 +112,17 @@ Only `description` is read from the frontmatter - by CM's lister
 (`internal/api/task_skills.go`) and by the harness `skill` tool
 (`contextmatrix-harness/tools/skill.go`). Every other key is ignored, and the
 file is handed to the model with its frontmatter intact, so extra keys are
-wasted tokens. There is no per-skill tool gate: `allowed-tools` is not honored
-anywhere.
+wasted tokens there. The agent worker and chat have no per-skill tool gate and
+ignore `allowed-tools`; Claude Code, which loads these skills in local
+sessions, does honor it.
 
 Two hard constraints, both silent when broken:
 
-- `description` must be a **single line**. A folded (`>`) or multi-line value
-  parses as empty and the skill is dropped from the menu with no error.
+- `description` must be a **single line**. The harness `skill` tool reads only
+  the text after `description:` on that line, so a folded or literal block
+  (`>`, `|`) reaches the menu as that bare indicator, and a value wrapped onto
+  a second line as its first line only. CM's lister parses the full YAML value,
+  so `GET /api/task-skills` still looks right while the menu is wrong.
 - The directory name must match `^[a-z0-9][a-z0-9._-]*$`. It is the callable
   name; the frontmatter `name` is not used for lookup.
 
@@ -162,9 +166,11 @@ worker's skill menu.
 Two other skill systems exist; don't confuse them with this repo.
 
 - **Workflow skills** live in the contextmatrix repo under `workflow-skills/`
-  and drive _what_ the agent does. Adding one needs both the markdown file and a
-  `skillBuilders` entry in `internal/mcp/prompts.go` - `get_skill` returns
-  `unknown skill` for any name absent from that map.
+  and drive _what_ the agent does. Adding one needs the markdown file, a
+  `skillBuilders` entry in `internal/mcp/prompts.go` (`get_skill` returns
+  `unknown skill` for any name absent from that map), and the name in the
+  `get_skill` input's `jsonschema` tag in `internal/mcp/tools.go`, which an
+  init-time check compares against that map and panics on drift.
 - **Interactive-session skills** (skill authoring, brainstorming, planning) run
   in Claude Code, where subagents exist. They do not belong here: no worker
   phase offers a subagent tool or a board tool. The worker's write phases
