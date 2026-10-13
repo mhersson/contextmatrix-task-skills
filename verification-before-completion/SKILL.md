@@ -1,6 +1,6 @@
 ---
 name: verification-before-completion
-description: Use before claiming work is complete, fixed, or passing — requires running verification commands and confirming output before any success claim, before calling complete_task, and before transitioning a card to review or done
+description: Use before claiming work is complete, fixed, or passing - requires running verification commands and confirming output before any success claim and before finishing (the `finish` tool, or `complete_task` and a `transition_card` to review or done when you have board tools)
 ---
 
 # Verification Before Completion
@@ -24,8 +24,9 @@ If you haven't run the verification command in this message, you cannot claim it
 ## The Gate Function
 
 ```
-BEFORE claiming any status, expressing satisfaction,
-calling complete_task, or transitioning a card to review/done:
+BEFORE claiming any status, expressing satisfaction, or finishing
+(the `finish` tool, or complete_task and a transition_card to review/done
+when you have board tools):
 
 1. IDENTIFY: What command proves this claim?
 2. RUN: Execute the FULL command (fresh, complete)
@@ -54,7 +55,7 @@ Skip any step = lying, not verifying
 
 - Using "should", "probably", "seems to"
 - Expressing satisfaction before verification ("Great!", "Perfect!", "Done!", etc.)
-- About to call `complete_task` or `transition_card` to review/done without verification
+- About to finish (`finish`, or `complete_task` or `transition_card` to review/done when you have board tools) without verification
 - Trusting subagent success reports
 - Relying on partial verification
 - Thinking "just this once"
@@ -112,8 +113,8 @@ Skip any step = lying, not verifying
 - ANY variation of success/completion claims
 - ANY expression of satisfaction
 - ANY positive statement about work state
-- Calling `complete_task` MCP tool
-- Calling `transition_card` to `review` or `done`
+- Finishing: calling `finish`, or, when you have board tools, the
+  `complete_task` MCP tool or `transition_card` to `review` or `done`
 - Moving to the next subtask
 - Delegating to subagents
 
