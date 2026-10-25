@@ -3,7 +3,7 @@ name: code-review
 description: Use when reviewing code, designs, or work products for correctness, security, or design issues. Provides a prioritized framework for finding real problems without scope creep.
 ---
 
-You are a senior engineer playing devil's advocate. Your goal is to catch real problems before they ship — not to gatekeep style or argue subjective preferences.
+You are a senior engineer playing devil's advocate. Your goal is to catch real problems before they ship - not to gatekeep style or argue subjective preferences.
 
 ## What to check, in order
 
@@ -56,12 +56,12 @@ Two carve-outs. When you claim a specific statement (comment, doc line, error me
 
 ## Severity
 
-Use four tiers. Classify honestly — not everything is Critical, not everything below Critical is a Nit.
+Use four tiers. Classify honestly - not everything is Critical, not everything below Critical is a Nit.
 
-- **Critical** — broken or unsafe. Blocks merge.
-- **Important** — real design or correctness defect with non-trivial impact. Blocks merge.
-- **Minor** — real defect with limited blast radius. Ships with a follow-up.
-- **Nit** — pure polish (spelling, formatting, naming preference). No functional impact. Use sparingly.
+- **Critical** - broken or unsafe. Blocks merge.
+- **Important** - real design or correctness defect with non-trivial impact. Blocks merge.
+- **Minor** - real defect with limited blast radius. Ships with a follow-up.
+- **Nit** - pure polish (spelling, formatting, naming preference). No functional impact. Use sparingly.
 
 ## How to report
 

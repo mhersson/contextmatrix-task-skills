@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: Use when implementing a new feature, bug fix, refactor, or behavior change that benefits from test-first development — write the failing test first, watch it fail, then write minimal code to pass
+description: Use when implementing a new feature, bug fix, refactor, or behavior change that benefits from test-first development - write the failing test first, watch it fail, then write minimal code to pass
 ---
 
 # Test-Driven Development (TDD)
@@ -68,7 +68,7 @@ Use the focused one for the RED/GREEN loop and the full one before you claim
 done. Do not copy the commands from this skill's examples - they are TypeScript
 illustrations, not this project's toolchain.
 
-### RED — Write Failing Test
+### RED - Write Failing Test
 
 Write one minimal test showing what should happen.
 
@@ -108,7 +108,7 @@ Vague name, tests mock not code.
 - Clear name
 - Real code (no mocks unless unavoidable)
 
-### Verify RED — Watch It Fail
+### Verify RED - Watch It Fail
 
 **MANDATORY. Never skip.**
 
@@ -123,7 +123,7 @@ Confirm:
 
 **Test errors?** Fix error, re-run until it fails correctly.
 
-### GREEN — Minimal Code
+### GREEN - Minimal Code
 
 Write simplest code to pass the test.
 
@@ -159,7 +159,7 @@ Over-engineered.
 
 Don't add features, refactor other code, or "improve" beyond the test.
 
-### Verify GREEN — Watch It Pass
+### Verify GREEN - Watch It Pass
 
 **MANDATORY.**
 
@@ -172,7 +172,7 @@ Confirm:
 
 **Other tests fail?** Fix now.
 
-### REFACTOR — Clean Up
+### REFACTOR - Clean Up
 
 After green only:
 - Remove duplication

@@ -1,6 +1,6 @@
 ---
 name: receiving-code-review
-description: Use when implementing changes from code review feedback or after a card was rejected from review back to in_progress — requires technical rigor and verification, not performative agreement or blind implementation
+description: Use when implementing changes from code review feedback or after a card was rejected from review back to in_progress - requires technical rigor and verification, not performative agreement or blind implementation
 ---
 
 # Code Review Reception
@@ -94,7 +94,7 @@ You understand 1,2,3,6. Unclear on 4,5.
 ## Source-Specific Handling
 
 ### From the human user (HITL)
-- **Trusted** — implement after understanding.
+- **Trusted** - implement after understanding.
 - **Still ask** if scope unclear.
 - **No performative agreement.**
 - **Skip to action** or technical acknowledgment.
@@ -124,7 +124,7 @@ suggestion unimplemented, and say which.
 
 IF suggestion seems wrong:
   Push back with technical reasoning via add_log
-  Do NOT silently disregard — leave a paper trail.
+  Do NOT silently disregard - leave a paper trail.
 
 IF can't easily verify:
   Say so via add_log: "Cannot verify [X] without [Y].
@@ -155,10 +155,10 @@ surrounding code to apply the same cross-cutting concerns (redaction, schema
 validation, accessibility spec, etc.) that govern the file?
 
 **Decision (fix / defer / reject):**
-- `fix` — Critical and Important findings, regardless of confidence. Low
+- `fix` - Critical and Important findings, regardless of confidence. Low
   confidence is a signal to read more before fixing, not to defer.
-- `fix` — Minor findings at high confidence.
-- `defer` — Minor findings at low or medium confidence. Spawn a follow-up with
+- `fix` - Minor findings at high confidence.
+- `defer` - Minor findings at low or medium confidence. Spawn a follow-up with
   `create_card(project=<this card's project>, title='Follow-up: <one-line
   finding summary>', body=<the finding's full Where/What/Why/Fix block>,
   type=<same type as the card under review>, priority='low',
@@ -171,7 +171,7 @@ validation, accessibility spec, etc.) that govern the file?
   with the finding's file:line and your reason, in the summary you finish with.
   A speculative fix that introduces a new defect is worse than a tracked
   follow-up.
-- `reject` — verification shows the finding is wrong. Record reasoning via
+- `reject` - verification shows the finding is wrong. Record reasoning via
   `add_log` if - and only if - `add_log` is in your tool list, else in the
   summary you finish with (same pattern as the existing pushback section).
 
@@ -188,7 +188,7 @@ Never re-emit the whole body - the upsert leaves every other section,
 including `## Review Findings`, untouched. One bullet per finding:
 
 ```
-- <Severity> | <file:line> — <one-line summary> → **<decision>** (<confidence>; <optional note>).
+- <Severity> | <file:line> - <one-line summary> → **<decision>** (<confidence>; <optional note>).
 ```
 
 This is the durable audit trail for a human reading the card. It is **not**
@@ -239,7 +239,7 @@ Push back when:
 When feedback IS correct:
 ```
 ✅ "Fixed. [Brief description of what changed]"
-✅ "Good catch — [specific issue]. Fixed at [file:line]."
+✅ "Good catch - [specific issue]. Fixed at [file:line]."
 ✅ [Just fix it and show in the code]
 
 ❌ "You're absolutely right!"
@@ -256,7 +256,7 @@ When feedback IS correct:
 
 If you pushed back and were wrong:
 ```
-✅ "You were right — I checked [X] and it does [Y]. Implementing now."
+✅ "You were right - I checked [X] and it does [Y]. Implementing now."
 ✅ "Verified this and you're correct. My initial understanding was wrong because [reason]. Fixing."
 
 ❌ Long apology
@@ -291,13 +291,13 @@ Reviewer: "Remove legacy code"
 Reviewer: "Remove legacy code"
 ✅ "Checking… build target is 10.15+, this API needs 13+. Need legacy
    for backward compat. Either fix the bundle ID (current is wrong) or
-   drop pre-13 support — flagging."
+   drop pre-13 support - flagging."
 ```
 
 **YAGNI (Good):**
 ```
 Reviewer: "Implement proper metrics tracking with database, date filters, CSV export"
-✅ "Grepped codebase — nothing calls this endpoint. Removing (YAGNI).
+✅ "Grepped codebase - nothing calls this endpoint. Removing (YAGNI).
    Logged in card for reviewer."
 ```
 

@@ -29,7 +29,7 @@ this list, and `uv run <tool>` reaches it:
 
 **Iron law:** every public function has a complete type signature.
 
-- `def parse(path: Path) -> Config:` — args and return type, always.
+- `def parse(path: Path) -> Config:` - args and return type, always.
 - `from __future__ import annotations` at the top of files with forward references.
 - `X | None` (Py 3.10+) over `Optional[X]`. `Optional[X]` only when the project's already on it.
 - `Sequence[X]` / `Mapping[K, V]` for parameters; `list[X]` / `dict[K, V]` for return types - accept broad, return specific (same idea as Go's accept interfaces, return concrete types).
@@ -43,7 +43,7 @@ this list, and `uv run <tool>` reaches it:
 - `with` for any resource (files, locks, connections). No bare `open()` without `with`.
 - Pathlib over `os.path`: `Path("data") / "config.yaml"`.
 - `@dataclass(frozen=True)` for plain data containers. `pydantic` only when validation/serialization is non-trivial AND the project already uses it.
-- Lazy log formatting: `log.info("got %s", item)` — not f-strings inside log calls (eager formatting cost).
+- Lazy log formatting: `log.info("got %s", item)` - not f-strings inside log calls (eager formatting cost).
 
 ## Testing
 
@@ -66,7 +66,7 @@ this list, and `uv run <tool>` reaches it:
 
 ## Imports & packaging
 
-- Standard library, then third-party, then local — separated by blank lines.
+- Standard library, then third-party, then local - separated by blank lines.
 - Absolute imports for clarity. Relative imports only for sibling modules in the same package.
 - No code at import time (no I/O, no network). Module-level defines names only.
 
