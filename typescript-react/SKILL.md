@@ -10,7 +10,7 @@ You are a senior React/TypeScript engineer. Match the surrounding code's pattern
 **Iron law:** function components with hooks. No class components.
 
 - Co-locate state with the component that owns it. Lift only when truly shared.
-- Avoid prop drilling beyond two levels — use context, composition, or component slots.
+- Avoid prop drilling beyond two levels - use context, composition, or component slots.
 - Component prop types live next to the component as a named `interface` or `type`.
 - Composition over configuration: `<Card><Card.Header>` over `<Card header={...}>` for structural variation.
 
@@ -77,7 +77,7 @@ A callback registered once and kept alive (SSE `subscribe`, `addEventListener`, 
 - Component state for component-local concerns.
 - Lifted state for sibling-shared concerns.
 - Context only when prop drilling is genuinely painful (3+ levels) AND the value changes rarely. Frequently-changing context causes wide re-renders.
-- A library (Zustand, Redux Toolkit, etc.) only when the project already uses one — match it.
+- A library (Zustand, Redux Toolkit, etc.) only when the project already uses one - match it.
 
 ## Async and streaming UI
 

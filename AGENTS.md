@@ -28,3 +28,4 @@ agents, and how to write one: [`README.md`](README.md).
 - **Never commit to `main`.** Work on a feature branch; tasks of a plan or
   scope the user approved commit there without asking again. Never push
   without explicit user approval.
+- No session links in commits or PRs.

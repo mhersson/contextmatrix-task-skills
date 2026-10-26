@@ -76,7 +76,7 @@ There is no fourth branch. Even when you have nothing to add, wrap with your own
 
 **Iron law:** accept interfaces, return concrete types. Define interfaces at the point of use (consumer-side), not where they're implemented.
 
-- Keep them small (1-2 methods). 5+ methods is a smell — split.
+- Keep them small (1-2 methods). 5+ methods is a smell - split.
 - Return concrete `*Client`, not `ClientInterface`. Constructor consumers can wrap if needed.
 - No pointers to interfaces: `Handle(r io.Reader)`, never `Handle(r *io.Reader)`.
 - Avoid `any` / `interface{}` in signatures. Use generics or concrete types.
@@ -114,11 +114,11 @@ On Go before 1.25, call `wg.Add` before `go`, never inside the goroutine - `Wait
 - Every goroutine has an explicit shutdown path or a parent context that cancels it.
 - Completion signals (done channels, WaitGroup.Done) fire after all side effects, not before.
 - When replacing a slot (channel field, cancel func), close or cancel the old one first.
-- Never start goroutines in library code without caller control — expose a `Start(ctx)` method instead of `go` in a constructor.
+- Never start goroutines in library code without caller control - expose a `Start(ctx)` method instead of `go` in a constructor.
 - Buffered channels need justification (a known producer/consumer ratio); unbuffered is the default.
 - `sync.WaitGroup` for fan-out; pass by pointer, never by value.
 - Don't copy a `sync.Mutex` after first use (no value-receiver methods on types that embed one).
-- `time.After` in loops leaks timers — use `time.NewTimer` with `Stop()` and drain.
+- `time.After` in loops leaks timers - use `time.NewTimer` with `Stop()` and drain.
 
 ## Safety traps
 
@@ -136,10 +136,10 @@ On Go before 1.25, call `wg.Add` before `go`, never inside the goroutine - `Wait
 ## Naming
 
 - Variables: short in narrow scope (`i`, `r`, `tt`), descriptive in wide scope.
-- Functions: verb for actions (`Process`), noun for getters — **no `Get` prefix**.
+- Functions: verb for actions (`Process`), noun for getters - **no `Get` prefix**.
 - Receivers: 1-2 letter abbreviation of the type (`s *Server`, `c *Client`). Never `this` or `self`.
-- MixedCaps always; never underscores. Acronyms are all-caps or all-lower: `HTTPServer`, `httpServer` — not `HttpServer`.
-- Packages: short, lowercase, singular noun. Avoid `util`, `helpers`, `common`, `misc`. No stutter — `user.Name()`, not `user.UserName()`.
+- MixedCaps always; never underscores. Acronyms are all-caps or all-lower: `HTTPServer`, `httpServer` - not `HttpServer`.
+- Packages: short, lowercase, singular noun. Avoid `util`, `helpers`, `common`, `misc`. No stutter - `user.Name()`, not `user.UserName()`.
 
 ## Testing
 
@@ -150,7 +150,7 @@ On Go before 1.25, call `wg.Add` before `go`, never inside the goroutine - `Wait
 - Match the project's existing assertion style (stdlib comparisons, `testify`, `go-cmp`). Don't introduce a new one.
 - Assert all observable side effects, not just the primary return value.
 - Buffered channels in concurrent test helpers to prevent goroutine leaks on failure.
-- `-race` must pass. No `time.Sleep` for synchronization — use channels or test deadlines.
+- `-race` must pass. No `time.Sleep` for synchronization - use channels or test deadlines.
 - No `defer` inside loops where the deferred call should run per-iteration; use a closure or refactor.
 
 ## Logging
@@ -165,12 +165,12 @@ On Go before 1.25, call `wg.Add` before `go`, never inside the goroutine - `Wait
 | -------------------------------------------- | --------------------------------------------------------------- |
 | `return err` without context                 | Caller can't tell where it came from                            |
 | `interface{}` / `any` in a signature         | Loses type safety; use generics or concrete types               |
-| Interface with 5+ methods                    | Hard to mock, weak abstraction — split                          |
+| Interface with 5+ methods                    | Hard to mock, weak abstraction - split                          |
 | `panic()` for recoverable error              | Return an error                                                 |
 | `go func()` with no shutdown path            | Resource leak                                                   |
 | `strings.Contains` for control flow          | Use `==` for exact matches; Contains is for search              |
-| `time.After` in a loop                       | Leaks timers — use `time.NewTimer` + `Stop()`                   |
-| Unbounded map with no eviction               | Memory leak — add cap or use LRU                                |
+| `time.After` in a loop                       | Leaks timers - use `time.NewTimer` + `Stop()`                   |
+| Unbounded map with no eviction               | Memory leak - add cap or use LRU                                |
 | Repeated string literals for state/status    | Use typed constants                                             |
 | `time.Sleep` for synchronization             | Use channels / context                                          |
 | Package named `util`, `common`, `helpers`    | Generic name hides purpose                                      |

@@ -169,8 +169,8 @@ Two other skill systems exist; don't confuse them with this repo.
   and drive _what_ the agent does. Adding one needs the markdown file, a
   `skillBuilders` entry in `internal/mcp/prompts.go` (`get_skill` returns
   `unknown skill` for any name absent from that map), and the name in the
-  `get_skill` input's `jsonschema` tag in `internal/mcp/tools.go`, which an
-  init-time check compares against that map and panics on drift.
+  `get_skill` input's `jsonschema` tag in `internal/mcp/tools.go`; the test
+  `TestGetSkillSchemaInSync` fails when the tag drifts from that map.
 - **Interactive-session skills** (skill authoring, brainstorming, planning) run
   in Claude Code, where subagents exist. They do not belong here: no worker
   phase offers a subagent tool or a board tool. The worker's write phases
